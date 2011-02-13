@@ -19,7 +19,7 @@ class KanachuCrawler
         prm[:response_body] = Kconv.kconv(prm[:response_body],Kconv::UTF8,Kconv::AUTO)
         prm[:response]["content-Type"] = "text/html; charset=utf-8"
         prm[:response_body].gsub!(/<meta[^>]*>/i) do |m|
-          m.sub(/S(?:hift)?[-|_]JIS|EUC[-_]JP|Windows-31J/i,"UTF-8")
+          m.gsub(/S(?:hift)?[-|_]JIS|EUC[-_]JP|Windows-31J/i,"UTF-8")
         end
       end
     end
@@ -34,19 +34,17 @@ class KanachuCrawler
         prm[:params] = np
       end
     end
-
     @busstop_list = nil
 
   end
 
   def search query,subquery={}
     @agent.get 'http://dia.kanachu.jp/bus/viewtop'
-    opt = {:hour=>:all,:day=>:all}
+    opt = {:hour=>:all,:day=>:all}.merge(subquery)
     if query.class == String 
-      opt.merge!(subquery)
       return _simple_search(query,opt)
     else
-      return _simple_search(query[:from],query.merge(subquery))
+      return _simple_search(query[:from],opt.merge(query))
     end
   end
 
@@ -64,7 +62,7 @@ class KanachuCrawler
       agent.transact do |a|
         a.page.form('fmTime').submit
         if opt[:new_diagram]
-          a.page.link_with(:text=>/apply=\d{4}\/\d{2}\/\d{2}/)
+          a.page.link_with(:href=>/apply=\d{4}\/\d{2}\/\d{2}/).click
         end
         data.concat(_get_data a,opt)
       end
