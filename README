@@ -1,0 +1,24 @@
+神奈中バスの時刻表を検索するためのRubyクラスです。結果はハッシュの配列で返ってきます。
+DBに突っ込むデータを生成するために作ったので「時刻表を自分好みに表示したい」「次のバスを知りたい」というような用途には向かないかもしれません。
+
+Requie:
+ Ruby (たぶん RUBY_VERSION >= 1.8.7)
+ Mechanize (gem install mechanize でインストールしてください)
+ 
+
+Example:
+  
+  c = KanachuCrawler.new
+
+  # 湘南台駅西口発ののバスをすべて取得 
+  c.search("湘南台駅西口")
+
+  # 土曜日12時台に湘南台駅西口を発車するバスを取得
+  c.search("湘南台駅西口",:hour=>12,:day=>:saturday)
+
+  # すべてハッシュによって指定することも可能
+  c.search(:from=>"湘南台駅西口",:hour=>12,:day=>:saturday)
+
+  # ダイヤ改正がある場合にダイヤ改正後の時刻表を取得
+  c.search(:from=>"湘南台駅西口",:new_diagram=>true)
+
